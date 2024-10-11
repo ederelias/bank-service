@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: node:18-alpine
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -25,7 +25,7 @@ jobs:
           npm run build
 
   test:
-    runs-on: node:18-alpine
+    runs-on: ubuntu-latest
     needs: build
 
     steps:
@@ -41,11 +41,11 @@ jobs:
           npm run test
 
   deploy:
-    runs-on: node:18-alpine
+    runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Deploy
+      - name: Deploy (Free Hosting Option)
         run: |
-          echo "Deploying ✅ -> 🌏 $(APP_NAME)..."
+          echo "Deploying ✅ -> 🌏 $(APP_NAME)... to free hosting platform"
