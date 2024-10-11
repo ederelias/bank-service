@@ -36,9 +36,18 @@ jobs:
         run: |
           npm install
 
-      - name: Run tests
+      - name: Run tests and generate coverage
         run: |
-          npm run test
+          npm run test -- --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/**/*.json
+          flags: unittests
+          name: code-coverage-report
+          fail_ci_if_error: true
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,4 +57,4 @@ jobs:
     steps:
       - name: Deploy (Free Hosting Option)
         run: |
-          echo "Deploying ✅ -> 🌏 $(APP_NAME)... to free hosting platform"
+          echo "Deploying ✅ -> 🌏 bank-service"
