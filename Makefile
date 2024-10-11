@@ -15,9 +15,6 @@ build:
 test:
 	npm run test
 
-start:
-	npm run start
-
 deploy:
 	@echo "Deploying ✅ -> 🌏 $(APP_NAME) "
 
@@ -44,3 +41,18 @@ dockerRunTests: dockerBuild dockerTest
 dockerDeploy: dockerBuild dockerTest
 	@echo "Deploying ✅ -> 🌏 $(APP_NAME)"
 .PHONY: dockerDeploy
+
+# Stop all running containers
+dockerStop:
+	docker stop $$(docker ps -q)
+.PHONY: stop
+
+# Remove all stopped containers
+dockerClean:
+	docker rm $$(docker ps -a -q)
+.PHONY: clean
+
+# Remove all images (use with caution!)
+dockerRemoveImages:
+	docker rmi $$(docker images -q)
+.PHONY: remove-images
