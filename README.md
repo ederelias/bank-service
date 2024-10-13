@@ -23,7 +23,6 @@ This project leverages a Makefile to simplify commands, enabling you to build, t
    ```sh
    make dockerBuild
    ```
-   ```
 2. **Run tests with Docker**:
    ```sh
    make dockerTest
