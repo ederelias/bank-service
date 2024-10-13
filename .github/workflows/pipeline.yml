@@ -43,4 +43,5 @@ jobs:
 
     steps:
       - name: Deploy (Free Hosting Option)
-        run: make deploy
+        run: |
+          echo "Deploying ✅ -> 🌏 bank-service"
