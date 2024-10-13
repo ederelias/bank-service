@@ -5,5 +5,6 @@ export const ErrorMessages = {
     InsufficientFunds: "Insufficient funds.",
     CannotTransferToSameAccount: "Cannot transfer to the same account.",
     CustomerAlreadyExists: "Customer already exists.",
-    CustomerNotFound: "Customer not found."
+    CustomerNotFound: "Customer not found.",
+    InvalidTransfer: "Invalid transfer operation."
 };

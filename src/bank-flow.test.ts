@@ -1,18 +1,24 @@
-import {Bank} from "./bank/bank";
-import {ErrorMessages} from "./messages/error-messages";
+import { Bank } from './bank/bank';
+import { ErrorMessages } from './messages/error-messages';
 
-describe("Bank Flow", () => {
+describe('Bank Flow', () => {
   let bank: Bank;
+  let kangarooId: string;
+  let koalaId: string;
+  let crocodileId: string;
 
   beforeEach(() => {
     bank = new Bank();
+    // Add Customers for reuse in all test cases
+    kangarooId = bank.addCustomer('Kangaroo', 500).id;
+    koalaId = bank.addCustomer('Koala', 300).id;
+    crocodileId = bank.addCustomer('Crocodile', 100).id;
   });
 
-  it("should allow adding customers, deposits, withdrawals, transfers, and show correct balances", () => {
-    // Add Customers
-    const kangaroo = bank.addCustomer("Kangaroo", 500);
-    const koala = bank.addCustomer("Koala", 300);
-    const crocodile = bank.addCustomer("Crocodile", 100);
+  it('should allow adding customers, deposits, withdrawals, transfers, and show correct balances', () => {
+    const kangaroo = bank.getCustomer(kangarooId);
+    const koala = bank.getCustomer(koalaId);
+    const crocodile = bank.getCustomer(crocodileId);
 
     // Initial Balances
     expect(kangaroo.getBalance()).toBe(500);
@@ -28,7 +34,7 @@ describe("Bank Flow", () => {
     expect(koala.getBalance()).toBe(200);
 
     // Transfer Money
-    bank.transferBetweenCustomers("Kangaroo", "Crocodile", 150);
+    bank.transferBetweenCustomers(kangaroo.id, crocodile.id, 150);
     expect(kangaroo.getBalance()).toBe(550);
     expect(crocodile.getBalance()).toBe(250);
 
@@ -36,36 +42,30 @@ describe("Bank Flow", () => {
     expect(bank.getTotalBalance()).toBe(1000);
   });
 
-  it("should not allow invalid operations and throw appropriate errors", () => {
-    // Add Customers
-    bank.addCustomer("Kangaroo", 500);
-    bank.addCustomer("Koala", 300);
-
+  it('should not allow invalid operations and throw appropriate errors', () => {
     // Duplicate Customer
-    expect(() => bank.addCustomer("Kangaroo", 200)).toThrow(ErrorMessages.CustomerAlreadyExists);
+    expect(() => bank.addCustomer('Kangaroo', 200)).toThrow(ErrorMessages.CustomerAlreadyExists);
 
     // Get Non-Existent Customer
-    expect(() => bank.getCustomer("NonExistent")).toThrow(ErrorMessages.CustomerNotFound);
+    expect(() => bank.getCustomer('non-existent-id')).toThrow(ErrorMessages.CustomerNotFound);
 
     // Withdraw More Than Balance
-    const koala = bank.getCustomer("Koala");
+    const koala = bank.getCustomer(koalaId);
     expect(() => koala.withdraw(400)).toThrow(ErrorMessages.InsufficientFunds);
 
     // Transfer More Than Balance
-    const kangaroo = bank.getCustomer("Kangaroo");
-    expect(() => bank.transferBetweenCustomers("Kangaroo", "Koala", 600)).toThrow(ErrorMessages.InsufficientFunds);
+    const kangaroo = bank.getCustomer(kangarooId);
+    expect(() => bank.transferBetweenCustomers(kangaroo.id, koala.id, 600)).toThrow(ErrorMessages.InsufficientFunds);
 
     // Transfer to Same Account
     expect(() => kangaroo.transferTo(50, kangaroo)).toThrow(ErrorMessages.CannotTransferToSameAccount);
   });
 
-  it("should handle concurrent operations safely", async () => {
-    // Add Customer
-    const customer = bank.addCustomer("Concurrent", 1000);
+  it('should handle concurrent operations safely', async () => {
+    const customer = bank.getCustomer(kangarooId);
     let errorsCount = 0;
     // Concurrent Withdrawals
-    const withdrawTasks = Array(11).fill(100).map(amount => {
-
+    const withdrawTasks = Array(10).fill(100).map(amount => {
       return new Promise<void>((resolve) => {
         try {
           customer.withdraw(amount);
@@ -78,6 +78,6 @@ describe("Bank Flow", () => {
 
     await Promise.all(withdrawTasks);
     expect(customer.getBalance()).toBeGreaterThanOrEqual(0);
-    expect(errorsCount).toBe(1);
+    expect(errorsCount).toBe(5);
   });
 });
